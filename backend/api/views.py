@@ -163,6 +163,40 @@ def testimonials(request):
 
 
 @api_view(['GET'])
+def newsletter_list(request):
+    """Get all newsletter subscriptions (for admin)"""
+    subscriptions = NewsletterSubscription.objects.all().order_by('-subscribed_at')
+    serializer = NewsletterSubscriptionSerializer(subscriptions, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def admin_dashboard(request):
+    """Get all submitted data in one place (for admin viewing)"""
+    dashboard_data = {
+        'contact_submissions': ContactSubmissionSerializer(
+            ContactSubmission.objects.all().order_by('-submitted_at'), 
+            many=True
+        ).data,
+        'project_inquiries': ProjectInquirySerializer(
+            ProjectInquiry.objects.all().order_by('-submitted_at'), 
+            many=True
+        ).data,
+        'newsletter_subscriptions': NewsletterSubscriptionSerializer(
+            NewsletterSubscription.objects.all().order_by('-subscribed_at'), 
+            many=True
+        ).data,
+        'stats': {
+            'total_contacts': ContactSubmission.objects.count(),
+            'total_inquiries': ProjectInquiry.objects.count(),
+            'total_subscriptions': NewsletterSubscription.objects.count(),
+            'active_subscriptions': NewsletterSubscription.objects.filter(is_active=True).count(),
+        }
+    }
+    return Response(dashboard_data)
+
+
+@api_view(['GET'])
 def stats(request):
     """Get website statistics"""
     stats_data = {

@@ -9,6 +9,7 @@ urlpatterns = [
     # Newsletter endpoints
     path('newsletter/subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
     path('newsletter/unsubscribe/', views.newsletter_unsubscribe, name='newsletter_unsubscribe'),
+    path('newsletter/list/', views.newsletter_list, name='newsletter_list'),
 
     # Project inquiry endpoints
     path('project-inquiry/submit/', views.project_inquiry_submit, name='project_inquiry_submit'),
@@ -23,4 +24,7 @@ urlpatterns = [
 
     # Stats endpoint
     path('stats/', views.stats, name='stats'),
+    
+    # Admin dashboard (view all data)
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
 ]
