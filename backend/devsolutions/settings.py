@@ -136,13 +136,20 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings - Allow frontend to make requests
-CORS_ALLOWED_ORIGINS = os.environ.get(
+CORS_ALLOWED_ORIGINS_ENV = os.environ.get(
     'CORS_ALLOWED_ORIGINS',
     'http://localhost:8080,http://localhost:8081,http://localhost:5173,http://127.0.0.1:8080,http://127.0.0.1:8081,http://127.0.0.1:5173'
-).split(',')
+)
+
+# Parse CORS allowed origins
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_ENV.split(',') if origin.strip()]
 
 # Allow all origins in development if DEBUG is True
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
     CORS_ALLOW_CREDENTIALS = True
+    # In production, if CORS_ALLOWED_ORIGINS is not set or empty, allow all (less secure but works for Lovable)
+    # For better security, set CORS_ALLOWED_ORIGINS in Render environment variables with your Lovable domain
+    if not CORS_ALLOWED_ORIGINS or CORS_ALLOWED_ORIGINS == ['']:
+        CORS_ALLOW_ALL_ORIGINS = True
