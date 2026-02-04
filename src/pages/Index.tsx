@@ -530,7 +530,7 @@ const Index = () => {
                     <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
                       <Shield className="h-6 w-6 text-primary" />
                     </div>
-                    <div>
+          <div>
                       <h3 className="font-semibold">Secure & Reliable</h3>
                       <p className="text-sm text-muted-foreground">Enterprise-grade security standards</p>
                     </div>
@@ -849,7 +849,7 @@ const Index = () => {
                 </li>
               </ul>
             </div>
-            <div>
+          <div>
               <h3 className="font-semibold mb-4">Connect</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
