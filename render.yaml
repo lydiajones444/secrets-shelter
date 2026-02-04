@@ -1,0 +1,42 @@
+services:
+  # Backend API Service
+  - type: web
+    name: devsolutions-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: cd backend && pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput
+    startCommand: cd backend && gunicorn devsolutions.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: devsolutions-backend.onrender.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: devsolutions-db
+          property: connectionString
+
+  # Frontend Service
+  - type: web
+    name: devsolutions-frontend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run preview
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+      - key: VITE_API_BASE_URL
+        sync: false
+
+# PostgreSQL Database
+databases:
+  - name: devsolutions-db
+    plan: free
+    region: oregon
