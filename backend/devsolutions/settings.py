@@ -151,10 +151,19 @@ if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
     CORS_ALLOW_CREDENTIALS = True
-    # In production, if CORS_ALLOWED_ORIGINS is not set or empty, allow all (less secure but works for Lovable)
-    # For better security, set CORS_ALLOWED_ORIGINS in Render environment variables with your Lovable domain
+    # In production, if CORS_ALLOWED_ORIGINS is not set, empty, or only contains localhost values, allow all
+    # This ensures Lovable and other frontends can connect
     if not CORS_ALLOWED_ORIGINS or CORS_ALLOWED_ORIGINS == ['']:
         CORS_ALLOW_ALL_ORIGINS = True
+    else:
+        # Check if only localhost values are present (common default)
+        localhost_only = all(
+            'localhost' in origin or '127.0.0.1' in origin 
+            for origin in CORS_ALLOWED_ORIGINS
+        )
+        if localhost_only:
+            # Allow all origins if only localhost is configured (production shouldn't use localhost)
+            CORS_ALLOW_ALL_ORIGINS = True
 
 # HTTPS/SSL Security Settings for Render
 # Render provides HTTPS automatically via reverse proxy

@@ -16,6 +16,8 @@ services:
         value: "False"
       - key: ALLOWED_HOSTS
         value: devsolutions-backend.onrender.com,*.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://a791ee6e-2963-49f6-b0e7-81b232de2a07.lovableproject.com,https://id-preview--a791ee6e-2963-49f6-b0e7-81b232de2a07.lovable.app,https://secrets-shelter.lovable.app
       - key: DATABASE_URL
         fromDatabase:
           name: devsolutions-db
