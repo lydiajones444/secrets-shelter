@@ -41,6 +41,93 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_submissions: {
+        Row: {
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          submitted_at: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          submitted_at?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          submitted_at?: string
+        }
+        Relationships: []
+      }
+      newsletter_subscriptions: {
+        Row: {
+          email: string
+          id: string
+          is_active: boolean
+          subscribed_at: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          is_active?: boolean
+          subscribed_at?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          is_active?: boolean
+          subscribed_at?: string
+        }
+        Relationships: []
+      }
+      project_inquiries: {
+        Row: {
+          budget_range: string | null
+          company: string | null
+          description: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          project_type: string
+          submitted_at: string
+          timeline: string | null
+        }
+        Insert: {
+          budget_range?: string | null
+          company?: string | null
+          description: string
+          email: string
+          id?: string
+          name: string
+          phone?: string | null
+          project_type: string
+          submitted_at?: string
+          timeline?: string | null
+        }
+        Update: {
+          budget_range?: string | null
+          company?: string | null
+          description?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          project_type?: string
+          submitted_at?: string
+          timeline?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
