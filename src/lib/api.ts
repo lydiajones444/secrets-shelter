@@ -1,23 +1,56 @@
-// API Base URL - Uses Render backend
+// API Base URL - Uses Render backend with HTTPS
+// Render automatically provides HTTPS for all services
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://devsolutions-backend.onrender.com/api';
 
-// Helper function for API calls
-async function apiCall(endpoint: string, options: RequestInit = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'An error occurred' }));
-    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+// Ensure URL uses HTTPS in production
+function getApiBaseUrl(): string {
+  const url = API_BASE_URL;
+  // Force HTTPS in production (when not localhost)
+  if (typeof window !== 'undefined' && !url.includes('localhost') && !url.includes('127.0.0.1')) {
+    return url.replace(/^http:/, 'https:');
   }
+  return url;
+}
 
-  return response.json();
+// Helper function for API calls with HTTPS enforcement
+async function apiCall(endpoint: string, options: RequestInit = {}) {
+  const baseUrl = getApiBaseUrl();
+  const url = `${baseUrl}${endpoint}`;
+  
+  // Ensure HTTPS in production
+  if (url.startsWith('http://') && !url.includes('localhost') && !url.includes('127.0.0.1')) {
+    console.warn('API call using HTTP instead of HTTPS. This may be insecure in production.');
+  }
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        ...options.headers,
+      },
+      // Ensure credentials are handled securely
+      credentials: 'omit', // Don't send cookies cross-origin unless needed
+    });
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch {
+        errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
+      }
+      throw new Error(errorData.message || errorData.detail || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('Unable to connect to the server. Please check your internet connection.');
+    }
+    throw error;
+  }
 }
 
 // Contact Form API - Uses Render Django Backend
