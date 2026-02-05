@@ -1,65 +1,52 @@
-import { supabase } from "@/integrations/supabase/client";
+// API Base URL - Uses Render backend
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://devsolutions-backend.onrender.com/api';
 
-// Contact Form API - Uses Lovable Cloud
+// Helper function for API calls
+async function apiCall(endpoint: string, options: RequestInit = {}) {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'An error occurred' }));
+    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+// Contact Form API - Uses Render Django Backend
 export const submitContact = async (data: {
   name: string;
   email: string;
   phone?: string;
   message: string;
 }) => {
-  const { error } = await supabase
-    .from("contact_submissions")
-    .insert({
+  return apiCall('/contact/submit/', {
+    method: 'POST',
+    body: JSON.stringify({
       name: data.name,
       email: data.email,
       phone: data.phone || null,
       message: data.message,
-    });
-
-  if (error) throw new Error(error.message);
-  
-  return { message: "Thank you for your message! We will get back to you soon." };
+    }),
+  });
 };
 
-// Newsletter API - Uses Lovable Cloud
+// Newsletter API - Uses Render Django Backend
 export const subscribeNewsletter = async (email: string) => {
-  // Check if already subscribed
-  const { data: existing } = await supabase
-    .from("newsletter_subscriptions")
-    .select("id, is_active")
-    .eq("email", email)
-    .maybeSingle();
-
-  if (existing) {
-    if (existing.is_active) {
-      return { message: "You are already subscribed to our newsletter!" };
-    }
-    // Reactivate subscription
-    const { error } = await supabase
-      .from("newsletter_subscriptions")
-      .update({ is_active: true })
-      .eq("id", existing.id);
-
-    if (error) throw new Error(error.message);
-    return { message: "Successfully re-subscribed to newsletter!" };
-  }
-
-  // New subscription
-  const { error } = await supabase
-    .from("newsletter_subscriptions")
-    .insert({ email, is_active: true });
-
-  if (error) {
-    if (error.code === "23505") {
-      return { message: "You are already subscribed to our newsletter!" };
-    }
-    throw new Error(error.message);
-  }
-  
-  return { message: "Successfully subscribed to newsletter!" };
+  return apiCall('/newsletter/subscribe/', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
 };
 
-// Project Inquiry API - Uses Lovable Cloud
+// Project Inquiry API - Uses Render Django Backend
 export const submitProjectInquiry = async (data: {
   name: string;
   email: string;
@@ -70,9 +57,9 @@ export const submitProjectInquiry = async (data: {
   description: string;
   timeline?: string;
 }) => {
-  const { error } = await supabase
-    .from("project_inquiries")
-    .insert({
+  return apiCall('/project-inquiry/submit/', {
+    method: 'POST',
+    body: JSON.stringify({
       name: data.name,
       email: data.email,
       company: data.company || null,
@@ -81,29 +68,36 @@ export const submitProjectInquiry = async (data: {
       budget_range: data.budget_range || null,
       description: data.description,
       timeline: data.timeline || null,
-    });
-
-  if (error) throw new Error(error.message);
-  
-  return { message: "Thank you for your inquiry! We will review it and get back to you soon." };
+    }),
+  });
 };
 
-// Portfolio API - Returns static data (no backend needed)
+// Portfolio API - Uses Render Django Backend
 export const getPortfolioProjects = async (featured?: boolean, category?: string) => {
-  // Return empty array - portfolio is managed elsewhere
-  return [];
+  const params = new URLSearchParams();
+  if (featured !== undefined) params.append('featured', featured.toString());
+  if (category) params.append('category', category);
+  
+  const queryString = params.toString();
+  const endpoint = queryString ? `/portfolio/?${queryString}` : '/portfolio/';
+  
+  return apiCall(endpoint);
 };
 
 export const getPortfolioProject = async (id: number) => {
-  return null;
+  return apiCall(`/portfolio/${id}/`);
 };
 
-// Testimonials API - Returns static data
+// Testimonials API - Uses Render Django Backend
 export const getTestimonials = async (featured?: boolean) => {
-  return [];
+  const endpoint = featured !== undefined 
+    ? `/testimonials/?featured=${featured}` 
+    : '/testimonials/';
+  
+  return apiCall(endpoint);
 };
 
-// Stats API - Returns default stats
+// Stats API - Uses Render Django Backend
 export const getStats = async () => {
-  return { total_projects: 50, total_testimonials: 25, total_subscriptions: 500 };
+  return apiCall('/stats/');
 };
