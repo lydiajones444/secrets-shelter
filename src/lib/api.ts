@@ -2,7 +2,17 @@
 // Render automatically provides HTTPS for all services
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://devsolutions-backend.onrender.com/api';
 
-// Helper function to handle API responses
+// Ensure URL uses HTTPS in production (Render requirement)
+function getApiBaseUrl(): string {
+  const url = API_BASE_URL;
+  // Force HTTPS in production (when not localhost)
+  if (typeof window !== 'undefined' && !url.includes('localhost') && !url.includes('127.0.0.1')) {
+    return url.replace(/^http:/, 'https:');
+  }
+  return url;
+}
+
+// Helper function to handle API responses with HTTPS enforcement
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Network error occurred' }));
@@ -19,7 +29,8 @@ export const submitContact = async (data: {
   message: string;
 }) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/contact/submit/`, {
+    const baseUrl = getApiBaseUrl();
+    const response = await fetch(`${baseUrl}/contact/submit/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -89,7 +100,8 @@ export const getPortfolioProjects = async (featured?: boolean, category?: string
     if (featured) params.append('featured', 'true');
     if (category) params.append('category', category);
     
-    const url = `${API_BASE_URL}/portfolio/${params.toString() ? '?' + params.toString() : ''}`;
+    const baseUrl = getApiBaseUrl();
+    const url = `${baseUrl}/portfolio/${params.toString() ? '?' + params.toString() : ''}`;
     const response = await fetch(url);
     return await handleResponse(response);
   } catch (error: any) {
@@ -104,7 +116,8 @@ export const getPortfolioProjects = async (featured?: boolean, category?: string
 
 export const getPortfolioProject = async (id: number) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/portfolio/${id}/`);
+    const baseUrl = getApiBaseUrl();
+    const response = await fetch(`${baseUrl}/portfolio/${id}/`);
     return await handleResponse(response);
   } catch (error: any) {
     if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
@@ -117,9 +130,10 @@ export const getPortfolioProject = async (id: number) => {
 // Testimonials API
 export const getTestimonials = async (featured?: boolean) => {
   try {
+    const baseUrl = getApiBaseUrl();
     const url = featured 
-      ? `${API_BASE_URL}/testimonials/?featured=true`
-      : `${API_BASE_URL}/testimonials/`;
+      ? `${baseUrl}/testimonials/?featured=true`
+      : `${baseUrl}/testimonials/`;
     const response = await fetch(url);
     return await handleResponse(response);
   } catch (error: any) {
@@ -135,7 +149,8 @@ export const getTestimonials = async (featured?: boolean) => {
 // Stats API
 export const getStats = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/stats/`);
+    const baseUrl = getApiBaseUrl();
+    const response = await fetch(`${baseUrl}/stats/`);
     return await handleResponse(response);
   } catch (error: any) {
     // Return default stats if backend is not available
