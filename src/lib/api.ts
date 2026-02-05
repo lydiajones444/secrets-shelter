@@ -1,5 +1,13 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://devsolutions-backend.onrender.com/api';
 
+// Check if error is a network error (backend unavailable)
+const isNetworkError = (error: any) => {
+  const message = error?.message || '';
+  return message.includes('Failed to fetch') || 
+         message.includes('NetworkError') || 
+         message.includes('Load failed');
+};
+
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
@@ -26,8 +34,8 @@ export const submitContact = async (data: {
     });
     return await handleResponse(response);
   } catch (error: any) {
-    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-      throw new Error('Cannot connect to server. Please make sure the backend is running on http://127.0.0.1:8000');
+    if (isNetworkError(error)) {
+      throw new Error('Backend is currently unavailable. Please try again later.');
     }
     throw error;
   }
@@ -45,8 +53,8 @@ export const subscribeNewsletter = async (email: string) => {
     });
     return await handleResponse(response);
   } catch (error: any) {
-    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-      throw new Error('Cannot connect to server. Please make sure the backend is running on http://127.0.0.1:8000');
+    if (isNetworkError(error)) {
+      throw new Error('Backend is currently unavailable. Please try again later.');
     }
     throw error;
   }
@@ -73,8 +81,8 @@ export const submitProjectInquiry = async (data: {
     });
     return await handleResponse(response);
   } catch (error: any) {
-    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-      throw new Error('Cannot connect to server. Please make sure the backend is running on http://127.0.0.1:8000');
+    if (isNetworkError(error)) {
+      throw new Error('Backend is currently unavailable. Please try again later.');
     }
     throw error;
   }
@@ -91,8 +99,8 @@ export const getPortfolioProjects = async (featured?: boolean, category?: string
     const response = await fetch(url);
     return await handleResponse(response);
   } catch (error: any) {
-    // Return empty array if backend is not available
-    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+    // Return empty array silently if backend is not available
+    if (isNetworkError(error)) {
       console.warn('Backend not available, returning empty portfolio');
       return [];
     }
@@ -105,8 +113,8 @@ export const getPortfolioProject = async (id: number) => {
     const response = await fetch(`${API_BASE_URL}/portfolio/${id}/`);
     return await handleResponse(response);
   } catch (error: any) {
-    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-      throw new Error('Cannot connect to server. Please make sure the backend is running on http://127.0.0.1:8000');
+    if (isNetworkError(error)) {
+      throw new Error('Backend is currently unavailable. Please try again later.');
     }
     throw error;
   }
@@ -121,8 +129,8 @@ export const getTestimonials = async (featured?: boolean) => {
     const response = await fetch(url);
     return await handleResponse(response);
   } catch (error: any) {
-    // Return empty array if backend is not available
-    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+    // Return empty array silently if backend is not available
+    if (isNetworkError(error)) {
       console.warn('Backend not available, returning empty testimonials');
       return [];
     }
@@ -136,8 +144,8 @@ export const getStats = async () => {
     const response = await fetch(`${API_BASE_URL}/stats/`);
     return await handleResponse(response);
   } catch (error: any) {
-    // Return default stats if backend is not available
-    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+    // Return default stats silently if backend is not available
+    if (isNetworkError(error)) {
       console.warn('Backend not available, returning default stats');
       return { total_projects: 0, total_testimonials: 0, total_subscriptions: 0 };
     }
