@@ -15,7 +15,7 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: devsolutions-backend.onrender.com,*.onrender.com
+        value: devsolutions-backend.onrender.com
       - key: DATABASE_URL
         fromDatabase:
           name: devsolutions-db
