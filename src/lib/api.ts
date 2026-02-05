@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
+// API Base URL - Uses Render backend with HTTPS
+// Render automatically provides HTTPS for all services
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://devsolutions-backend.onrender.com/api';
 
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {
@@ -27,7 +29,7 @@ export const submitContact = async (data: {
     return await handleResponse(response);
   } catch (error: any) {
     if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-      throw new Error('Cannot connect to server. Please make sure the backend is running on http://127.0.0.1:8000');
+      throw new Error('Cannot connect to server. Please check your internet connection.');
     }
     throw error;
   }
@@ -46,7 +48,7 @@ export const subscribeNewsletter = async (email: string) => {
     return await handleResponse(response);
   } catch (error: any) {
     if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-      throw new Error('Cannot connect to server. Please make sure the backend is running on http://127.0.0.1:8000');
+      throw new Error('Cannot connect to server. Please check your internet connection.');
     }
     throw error;
   }
@@ -74,7 +76,7 @@ export const submitProjectInquiry = async (data: {
     return await handleResponse(response);
   } catch (error: any) {
     if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-      throw new Error('Cannot connect to server. Please make sure the backend is running on http://127.0.0.1:8000');
+      throw new Error('Cannot connect to server. Please check your internet connection.');
     }
     throw error;
   }
@@ -106,7 +108,7 @@ export const getPortfolioProject = async (id: number) => {
     return await handleResponse(response);
   } catch (error: any) {
     if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-      throw new Error('Cannot connect to server. Please make sure the backend is running on http://127.0.0.1:8000');
+      throw new Error('Cannot connect to server. Please check your internet connection.');
     }
     throw error;
   }
